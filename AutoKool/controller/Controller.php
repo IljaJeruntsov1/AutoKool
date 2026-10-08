@@ -1,69 +1,73 @@
 <?php
 
-class Controller {
-
-    public static function StartSite() {
-        $arr = News::getLast10News();
+class Controller
+{
+    public static function StartSite()
+    {
+        $arr = Course::getPopularCourses();
         include_once 'view/start.php';
     }
 
-    public static function AllCategory() {
+    public static function AllCategory()
+    {
         $arr = Category::getAllCategory();
         include_once 'view/category.php';
     }
 
-    public static function AllNews() {
-        $arr = News::getAllNews();
-        include_once 'view/allnews.php';
+    public static function AllCourses()
+    {
+        $arr = Course::getAllCourses();
+        include_once 'view/allcourses.php';
     }
 
-    public static function NewsByCatID($id) {
-        $arr = News::getNewsByCategoryID($id);
-        include_once 'view/catnews.php';
+    public static function CoursesByCatID($id)
+    {
+        $arr = Course::getCoursesByCategoryID($id);
+        include_once 'view/catcourses.php';
     }
 
-    public static function NewsByID($id) {
-        $n = News::getNewsByID($id);
-        include_once 'view/readnews.php';
+    public static function CourseByID($id)
+    {
+        $n = Course::getCourseByID($id);
+        include_once 'view/course.php';
     }
 
-    public static function error404() {
+    public static function error404()
+    {
         include_once 'view/error404.php';
     }
 
-    public static function InsertComment($c,$id)    {
-        Comments::InsertComment($c,$id);
-        //self::NewsByID($id);
-        header('Location:news?id='.$id.'#ctable');
+    public static function InsertReview($c, $id)
+    {
+        Review::insertReview($c, $id);
+
+        header('Location:course?id=' . $id . '#reviewtable');
     }
 
-    public static function Comments($newsid)       {
-        $arr = Comments::getCommentByNewsID($newsid);
-        ViewComments::CommentsByNews($arr);
+    public static function Reviews($courseid)
+    {
+        $arr = Review::getReviewsByCourseID($courseid);
 
-    }
-    public static function CommentsCount($newsid)       {
-        $arr = Comments::getCommentsCountByNewsID($newsid);
-        ViewComments::CommentsCount($arr);
-
+        include_once 'view/reviews.php';
     }
 
-    public static function CommentsCountWithAncor($newsid)       {
-        $arr = Comments::getCommentsCountByNewsID($newsid);
-        ViewComments::CommentsCountWithAncor($arr);
+    public static function ReviewsCount($courseid)
+    {
+        $arr = Review::getReviewsCountByCourseID($courseid);
+
+        return $arr;
     }
 
-//----------------------------------РЕГИСТРАЦИЯ
     public static function registerForm()
     {
-        include_once('view/formRegister.php');
+        include_once 'view/formRegister.php';
     }
 
     public static function registerUser()
     {
-        $result = Register::registerUser();
+        $result = User::registerUser();
 
-        include_once('view/answerRegister.php');
+        include_once 'view/answerRegister.php';
     }
 }
 ?>
