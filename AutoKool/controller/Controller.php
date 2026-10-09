@@ -26,11 +26,23 @@ class Controller
         include_once 'view/catcourses.php';
     }
 
+
     public static function CourseByID($id)
     {
-        $n = Course::getCourseByID($id);
-        include_once 'view/course.php';
+        $n = Course::getCourseByID((int)$id);
+
+        if (!$n) {
+            self::error404();
+            return;
+        }
+
+        $reviews = Review::getReviewsByCourseID((int)$id);
+        $reviewCount = Review::getReviewsCountByCourseID((int)$id);
+
+        include_once __DIR__ . '/../view/course.php';
     }
+
+
 
     public static function error404()
     {
