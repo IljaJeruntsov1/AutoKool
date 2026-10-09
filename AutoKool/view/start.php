@@ -2,7 +2,7 @@
 ob_start();
 ?>
 
-<h1>Попulaarsed kursused</h1>
+<h1>populaarsed kursused</h1>
 <br>
 
 <?php
