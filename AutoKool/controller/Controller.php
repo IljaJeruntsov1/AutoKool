@@ -49,12 +49,28 @@ class Controller
         include_once 'view/error404.php';
     }
 
-    public static function InsertReview($c, $id)
-    {
-        Review::insertReview($c, $id);
+public static function InsertReview($text, $id)
+{
+    $courseId = filter_var($id, FILTER_VALIDATE_INT);
 
-        header('Location:course?id=' . $id . '#reviewtable');
+    if (!$courseId || trim($text) === '') {
+        header('Location: allcourses');
+        exit;
     }
+
+    $course = Course::getCourseByID($courseId);
+
+    if (!$course) {
+        self::error404();
+        return;
+    }
+
+    Review::insertReview(trim($text), $courseId);
+
+    header('Location: course?id=' . $courseId . '#reviewtable');
+    exit;
+}
+
 
     public static function Reviews($courseid)
     {
