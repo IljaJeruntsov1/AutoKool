@@ -70,12 +70,29 @@
 
             <div class="d-flex">
 
-                <a
-                    href="registerForm"
-                    class="btn btn-outline-light"
-                >
-                    Registreeru
-                </a>
+            <?php if (Auth::isLoggedIn()): ?>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <span class="text-white">
+                        Tere, <?= htmlspecialchars(
+                            Auth::currentUser()['username'],
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>!
+                    </span>
+
+                    <form action="logout" method="post" class="m-0">
+                        <button type="submit" class="btn btn-outline-light">
+                            Logi välja
+                        </button>
+                    </form>
+                </div>
+            <?php else: ?>
+                <div class="d-flex gap-2">
+                    <a href="login" class="btn btn-outline-light">Logi sisse</a>
+                    <a href="registerForm" class="btn btn-primary">Registreeru</a>
+                </div>
+            <?php endif; ?>
+                
 
             </div>
 

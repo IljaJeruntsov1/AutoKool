@@ -36,6 +36,17 @@ elseif (
     }
 }
 
+elseif ($path == 'login' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    Controller::loginForm();
+}
+
+elseif ($path == 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    Controller::loginUser();
+}
+
+elseif ($path == 'logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    Controller::logoutUser();
+}
 
 
 elseif ($path == 'reviews' AND isset($_GET['id'])) {

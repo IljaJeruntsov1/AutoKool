@@ -5,97 +5,130 @@ class Controller
     public static function StartSite()
     {
         $arr = Course::getPopularCourses();
-        include_once 'view/start.php';
+        include __DIR__ . '/../view/start.php';
     }
 
     public static function AllCategory()
     {
         $arr = Category::getAllCategory();
-        include_once 'view/category.php';
+        include __DIR__ . '/../view/category.php';
     }
 
     public static function AllCourses()
     {
         $arr = Course::getAllCourses();
-        include_once 'view/allcourses.php';
+        include __DIR__ . '/../view/allcourses.php';
     }
 
     public static function CoursesByCatID($id)
     {
-        $arr = Course::getCoursesByCategoryID($id);
-        include_once 'view/catcourses.php';
+        $arr = Course::getCoursesByCategoryID((int)$id);
+        include __DIR__ . '/../view/catcourses.php';
     }
-
 
     public static function CourseByID($id)
     {
-        $n = Course::getCourseByID((int)$id);
+        $courseId = filter_var($id, FILTER_VALIDATE_INT);
+
+        if (!$courseId || $courseId < 1) {
+            self::error404();
+            return;
+        }
+
+        $n = Course::getCourseByID($courseId);
 
         if (!$n) {
             self::error404();
             return;
         }
 
-        $reviews = Review::getReviewsByCourseID((int)$id);
-        $reviewCount = Review::getReviewsCountByCourseID((int)$id);
+        $reviews = Review::getReviewsByCourseID($courseId);
+        $reviewCount = Review::getReviewsCountByCourseID($courseId);
 
-        include_once __DIR__ . '/../view/course.php';
+        include __DIR__ . '/../view/course.php';
     }
-
-
 
     public static function error404()
     {
-        include_once 'view/error404.php';
+        http_response_code(404);
+        include __DIR__ . '/../view/error404.php';
     }
 
-public static function InsertReview($text, $id)
-{
-    $courseId = filter_var($id, FILTER_VALIDATE_INT);
+    public static function InsertReview($text, $id)
+    {
+        $courseId = filter_var($id, FILTER_VALIDATE_INT);
+        $text = trim($text);
 
-    if (!$courseId || trim($text) === '') {
-        header('Location: allcourses');
+        if (!$courseId || $courseId < 1 || $text === '' || mb_strlen($text) > 2000) {
+            header('Location: allcourses');
+            exit;
+        }
+
+        $course = Course::getCourseByID($courseId);
+
+        if (!$course) {
+            self::error404();
+            return;
+        }
+
+        Review::insertReview($text, $courseId);
+
+        header('Location: course?id=' . $courseId . '#reviewtable');
         exit;
     }
 
-    $course = Course::getCourseByID($courseId);
-
-    if (!$course) {
-        self::error404();
-        return;
-    }
-
-    Review::insertReview(trim($text), $courseId);
-
-    header('Location: course?id=' . $courseId . '#reviewtable');
-    exit;
-}
-
-
     public static function Reviews($courseid)
     {
-        $arr = Review::getReviewsByCourseID($courseid);
-
-        include_once 'view/reviews.php';
+        $arr = Review::getReviewsByCourseID((int)$courseid);
+        include __DIR__ . '/../view/reviews.php';
     }
 
     public static function ReviewsCount($courseid)
     {
-        $arr = Review::getReviewsCountByCourseID($courseid);
-
-        return $arr;
+        return Review::getReviewsCountByCourseID((int)$courseid);
     }
 
     public static function registerForm()
     {
-        include_once 'view/formRegister.php';
+        include __DIR__ . '/../view/formRegister.php';
     }
 
     public static function registerUser()
     {
         $result = User::registerUser();
+        include __DIR__ . '/../view/answerRegister.php';
+    }
 
-        include_once 'view/answerRegister.php';
+    // Авторизация: показать форму входа
+    public static function loginForm()
+    {
+        $result = null;
+        include __DIR__ . '/../view/login.php';
+    }
+
+    // Авторизация: обработать форму входа
+    public static function loginUser()
+    {
+        $result = Auth::login(
+            $_POST['email'] ?? '',
+            $_POST['password'] ?? ''
+        );
+
+        if ($result['success']) {
+            header('Location: ./');
+            exit;
+        }
+
+        include __DIR__ . '/../view/login.php';
+    }
+
+    // Выход из аккаунта
+    public static function logoutUser()
+    {
+        Auth::logout();
+
+        header('Location: ./');
+        exit;
     }
 }
 ?>
