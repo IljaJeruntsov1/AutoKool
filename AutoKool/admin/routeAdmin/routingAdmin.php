@@ -3,7 +3,7 @@
 
 require_once __DIR__ . '/../controllerAdmin/AdminController.php';
 
-// Обработка POST-запросов
+// POST-запросы
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $action = $_POST['action'] ?? '';
@@ -22,6 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             AdminController::cancelRegistration();
             break;
 
+        case 'restore_registration':
+            AdminController::restoreRegistration();
+            break;
+
         default:
             http_response_code(404);
             echo 'Toimingut ei leitud.';
@@ -31,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Обычные страницы
+// Страницы
 $page = $_GET['page'] ?? 'dashboard';
 
 switch ($page) {

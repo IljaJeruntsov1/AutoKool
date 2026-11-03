@@ -131,5 +131,28 @@ public static function cancelRegistration()
     header('Location: ?page=registrations&message=cancelled');
     exit;
 }
+
+
+    // Вернуть ученика на курс
+    public static function restoreRegistration()
+    {
+        self::validateCsrfToken();
+
+        $id = filter_var(
+            $_POST['registration_id'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+
+        if (!$id || $id < 1) {
+            header('Location: ?page=registrations&message=invalid');
+            exit;
+        }
+
+        AdminRegistration::restoreRegistration($id);
+
+        header('Location: ?page=registrations&message=restored');
+        exit;
+    }
+
 }
 ?>

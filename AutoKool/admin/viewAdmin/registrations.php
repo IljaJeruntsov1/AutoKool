@@ -1,6 +1,5 @@
 
 <?php
-// Ожидаются переменные $registrations и $csrfToken
 ?>
 
 <!DOCTYPE html>
@@ -11,12 +10,14 @@
     <title>Kursustele registreerunud õpilased</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
 
 <div class="container py-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Õpilaste registreeringud</h2>
+
         <a href="index.php?page=dashboard" class="btn btn-secondary">
             Tagasi
         </a>
@@ -25,6 +26,10 @@
     <?php if (($_GET['message'] ?? '') === 'cancelled'): ?>
         <div class="alert alert-success">
             Õpilase registreering on tühistatud.
+        </div>
+    <?php elseif (($_GET['message'] ?? '') === 'restored'): ?>
+        <div class="alert alert-success">
+            Õpilane on kursusele tagasi lisatud!
         </div>
     <?php elseif (($_GET['message'] ?? '') === 'invalid'): ?>
         <div class="alert alert-danger">
@@ -42,7 +47,9 @@
             <?php else: ?>
 
                 <div class="table-responsive">
+
                     <table class="table table-striped align-middle">
+
                         <thead>
                             <tr>
                                 <th>Õpilane</th>
@@ -55,74 +62,113 @@
                         </thead>
 
                         <tbody>
-                            <?php foreach ($registrations as $registration): ?>
-                                <tr>
-                                    <td>
-                                        <?= htmlspecialchars($registration['username']) ?>
-                                    </td>
 
-                                    <td>
-                                        <?= htmlspecialchars($registration['email']) ?>
-                                    </td>
+                        <?php foreach ($registrations as $registration): ?>
 
-                                    <td>
-                                        <?= htmlspecialchars($registration['course_title']) ?>
-                                    </td>
+                            <tr>
 
-                                    <td>
-                                        <?= htmlspecialchars($registration['registration_date']) ?>
-                                    </td>
+                                <td>
+                                    <?= htmlspecialchars($registration['username']) ?>
+                                </td>
 
-                                    <td>
-                                        <?php if ($registration['status'] === 'cancelled'): ?>
-                                            <span class="badge bg-secondary">
-                                                Tühistatud
-                                            </span>
-                                        <?php elseif ($registration['status'] === 'confirmed'): ?>
-                                            <span class="badge bg-success">
-                                                Kinnitatud
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge bg-warning text-dark">
-                                                Ootel
-                                            </span>
-                                        <?php endif; ?>
-                                    </td>
+                                <td>
+                                    <?= htmlspecialchars($registration['email']) ?>
+                                </td>
 
-                                    <td>
-                                        <?php if ($registration['status'] !== 'cancelled'): ?>
+                                <td>
+                                    <?= htmlspecialchars($registration['course_title']) ?>
+                                </td>
 
-                                            <form method="POST"
-                                                  action="index.php?page=registrations"
-                                                  onsubmit="return confirm('Kas soovid selle õpilase kursuselt eemaldada?');">
+                                <td>
+                                    <?= htmlspecialchars($registration['registration_date']) ?>
+                                </td>
 
-                                                <input type="hidden"
-                                                       name="action"
-                                                       value="cancel_registration">
+                                <td>
 
-                                                <input type="hidden"
-                                                       name="csrf_token"
-                                                       value="<?= htmlspecialchars($csrfToken) ?>">
+                                    <?php if ($registration['status'] === 'cancelled'): ?>
 
-                                                <input type="hidden"
-                                                       name="registration_id"
-                                                       value="<?= (int)$registration['id'] ?>">
+                                        <span class="badge bg-secondary">
+                                            Tühistatud
+                                        </span>
 
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    Eemalda kursuselt
-                                                </button>
-                                            </form>
+                                    <?php elseif ($registration['status'] === 'confirmed'): ?>
 
-                                        <?php else: ?>
+                                        <span class="badge bg-success">
+                                            Kinnitatud
+                                        </span>
 
-                                            <span class="text-muted">Juba tühistatud</span>
+                                    <?php else: ?>
 
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+                                        <span class="badge bg-warning text-dark">
+                                            Ootel
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+                                <td>
+
+                                    <?php if ($registration['status'] !== 'cancelled'): ?>
+
+                                        <form method="POST"
+                                              action="index.php?page=registrations"
+                                              onsubmit="return confirm('Kas soovid selle õpilase kursuselt eemaldada?');">
+
+                                            <input type="hidden"
+                                                   name="action"
+                                                   value="cancel_registration">
+
+                                            <input type="hidden"
+                                                   name="csrf_token"
+                                                   value="<?= htmlspecialchars($csrfToken) ?>">
+
+                                            <input type="hidden"
+                                                   name="registration_id"
+                                                   value="<?= (int)$registration['id'] ?>">
+
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                Eemalda kursuselt
+                                            </button>
+
+                                        </form>
+
+                                    <?php else: ?>
+
+                                        <form method="POST"
+                                              action="index.php?page=registrations"
+                                              onsubmit="return confirm('Kas soovid õpilase uuesti kursusele registreerida?');">
+
+                                            <input type="hidden"
+                                                   name="action"
+                                                   value="restore_registration">
+
+                                            <input type="hidden"
+                                                   name="csrf_token"
+                                                   value="<?= htmlspecialchars($csrfToken) ?>">
+
+                                            <input type="hidden"
+                                                   name="registration_id"
+                                                   value="<?= (int)$registration['id'] ?>">
+
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                Lisa kursusele tagasi
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
+
                         </tbody>
+
                     </table>
+
                 </div>
 
             <?php endif; ?>

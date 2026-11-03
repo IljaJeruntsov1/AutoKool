@@ -13,7 +13,7 @@ class AdminReview
                 reviews.date AS review_date,
                 users.username,
                 courses.title AS course_title
-             FROM reviews
+             FROM reviews   
              LEFT JOIN users
                 ON reviews.user_id = users.id
              INNER JOIN courses

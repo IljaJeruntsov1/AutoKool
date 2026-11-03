@@ -37,6 +37,21 @@ class AdminRegistration
             [$id]
         );
     }
+
+    
+    // Вернуть ученика на курс
+    public static function restoreRegistration($id)
+    {
+        $db = new Database();
+
+        return $db->executeRun(
+            "UPDATE registrations
+             SET status = 'pending'
+             WHERE id = ? AND status = 'cancelled'",
+            [$id]
+        );
+    }
+
 }
 
 ?>
