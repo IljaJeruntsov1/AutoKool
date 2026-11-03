@@ -62,7 +62,12 @@ elseif ($path == 'registerAnswer') {
     $control = new Controller();
     $response = $control->registerUser();
 }
-
+elseif (
+    $path === 'enroll'
+    && $_SERVER['REQUEST_METHOD'] === 'POST'
+) {
+    Controller::enrollCourse();
+}
 else {
     $response = Controller::error404();
 }

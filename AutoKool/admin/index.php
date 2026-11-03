@@ -1,13 +1,22 @@
 <?php
-session_start();
-    require_once '../inc/database.php';
-    include_once("modelAdmin/modelAdmin.php");
-    include_once("modelAdmin/modelAdminNews.php");
-    include_once("modelAdmin/modelAdminCategory.php");
 
-    include_once("controllerAdmin/controllerAdmin.php");
-    include_once("controllerAdmin/controllerAdminNews.php");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-    include('routeAdmin/routingAdmin.php'); //!!!!
+require_once __DIR__ . '/../inc/Database.php';
+require_once __DIR__ . '/../model/Auth.php';
 
-    echo $response;
+if (!Auth::isLoggedIn()) {
+    header('Location: ../login');
+    exit;
+}
+
+if (!Auth::isAdmin()) {
+    http_response_code(403);
+    exit('403 — Juurdepääs keelatud. Ainult administraatoritele.');
+}
+
+
+require_once __DIR__ . '/routeAdmin/routingAdmin.php';
+?>

@@ -1,54 +1,57 @@
-<?php
-$host = explode('?', $_SERVER['REQUEST_URI'])[0];
-$num=substr_count($host,'/');
-$path = explode('/', $host)[$num];
 
-if ($path == '' OR $path == 'index.php')
-{
-    // Главная страница -
-    $response = controllerAdmin::formLoginSite();
+<?php
+
+require_once __DIR__ . '/../controllerAdmin/AdminController.php';
+
+// Обработка POST-запросов
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $action = $_POST['action'] ?? '';
+
+    switch ($action) {
+
+        case 'update_review':
+            AdminController::updateReview();
+            break;
+
+        case 'delete_review':
+            AdminController::deleteReview();
+            break;
+
+        case 'cancel_registration':
+            AdminController::cancelRegistration();
+            break;
+
+        default:
+            http_response_code(404);
+            echo 'Toimingut ei leitud.';
+            break;
+    }
+
+    exit;
 }
-// ------ ВХОД -------------
-elseif ($path == 'login')
-{
-    // Форма входа
-    $response = controllerAdmin::loginAction();
+
+// Обычные страницы
+$page = $_GET['page'] ?? 'dashboard';
+
+switch ($page) {
+
+    case 'dashboard':
+        AdminController::dashboard();
+        break;
+
+    case 'reviews':
+        AdminController::reviews();
+        break;
+
+    case 'registrations':
+        AdminController::registrations();
+        break;
+
+    default:
+        http_response_code(404);
+        echo '<h1>404 — Lehte ei leitud</h1>';
+        break;
 }
-elseif ($path == 'logout')
-{
-    // Выход
-    $response = controllerAdmin::logoutAction();
-}
-elseif ($path == 'newsAdmin')
-{
-    // Список новостей
-    $response = controllerAdminNews::NewsList();
-}
-elseif ($path == 'newsAdd')
-{
-    $response = controllerAdminNews::NewsAddForm();
-}
-elseif ($path == 'newsAddResult')
-{
-    $response = controllerAdminNews::NewsAddResult();
-}
-elseif ($path == 'newsEdit' and isset($_GET['id']))
-{
-    $response = controllerAdminNews::NewsEditForm($_GET['id']);
-}
-elseif ($path == 'newsEditResult' and isset($_GET['id']))
-{
-    $response = controllerAdminNews::NewsEditResult($_GET['id']);
-}
-elseif ($path =='newsDel' && isset($_GET['id']))
-{
-    $response = controllerAdminNews::newsDeleteForm($_GET['id']);
-}
-elseif ($path =='newsDelResult' && isset($_GET['id']))
-{
-    $response = controllerAdminNews::newsDeleteResult($_GET['id']);
-}
-else
-{   // Страница не существует
-    $response = controllerAdmin::error404();
-}
+
+?>

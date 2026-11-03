@@ -115,7 +115,22 @@ class Controller
         );
 
         if ($result['success']) {
-            header('Location: ./');
+            $returnTo = $_SESSION['return_to'] ?? './';
+
+            unset($_SESSION['return_to']);
+
+            // Разрешаем перенаправление только на внутренние страницы
+            if (
+                !is_string($returnTo) ||
+                $returnTo === '' ||
+                str_starts_with($returnTo, '/') ||
+                str_contains($returnTo, '://') ||
+                str_contains($returnTo, '\\')
+            ) {
+                $returnTo = './';
+            }
+
+            header('Location: ' . $returnTo);
             exit;
         }
 
@@ -130,5 +145,58 @@ class Controller
         header('Location: ./');
         exit;
     }
+
+    public static function enrollCourse()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: allcourses');
+        exit;
+    }
+
+    $courseId = filter_var(
+        $_POST['course_id'] ?? null,
+        FILTER_VALIDATE_INT
+    );
+
+    if (!$courseId || $courseId < 1) {
+        header('Location: allcourses');
+        exit;
+    }
+
+    // Проверяем существование курса
+    $course = Course::getCourseByID($courseId);
+
+    if (!$course) {
+        self::error404();
+        return;
+    }
+
+    // Если пользователь не авторизован,
+    // запоминаем курс и отправляем его на вход
+    if (!Auth::isLoggedIn()) {
+        $_SESSION['return_to'] = 'course?id=' . $courseId;
+
+        header('Location: login');
+        exit;
+    }
+
+    $user = Auth::currentUser();
+
+    $result = Registration::registerForCourse(
+        $user['id'],
+        $courseId
+    );
+
+    $status = $result['success'] ? 'success' : 'error';
+
+    $_SESSION['enrollment_message'] = $result['message'];
+
+    header(
+        'Location: course?id=' . $courseId .
+        '&enrollment=' . $status . '#enrollment'
+    );
+
+    exit;
+}
 }
 ?>

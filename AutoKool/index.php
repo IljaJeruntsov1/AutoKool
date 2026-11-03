@@ -12,6 +12,7 @@ require_once __DIR__ . '/model/Course.php';
 require_once __DIR__ . '/model/Category.php';
 require_once __DIR__ . '/model/Review.php';
 require_once __DIR__ . '/model/User.php';
+require_once __DIR__ . '/model/Registration.php';
 
 require_once __DIR__ . '/controller/Controller.php';
 

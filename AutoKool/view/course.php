@@ -46,11 +46,41 @@ ob_start();
                 </div>
             </div>
 
-            <a href="registerForm" class="btn btn-primary btn-lg">
+        <form action="enroll" method="post" class="mt-3">
+            <input
+                type="hidden"
+                name="course_id"
+                value="<?= (int)$n['id'] ?>"
+            >
+
+            <button type="submit" class="btn btn-primary btn-lg">
                 Registreeru õpilaseks
-            </a>
-        </div>
+            </button>
+        </form>
+            </div>
+            <div id="enrollment" class="mt-3">
+        <?php if (isset($_GET['enrollment'])): ?>
+            <?php
+            $enrollmentMessage = $_SESSION['enrollment_message'] ?? '';
+
+            unset($_SESSION['enrollment_message']);
+
+            $isSuccess = $_GET['enrollment'] === 'success';
+            ?>
+
+            <?php if ($enrollmentMessage !== ''): ?>
+                <div class="alert <?= $isSuccess ? 'alert-success' : 'alert-warning' ?>">
+                    <?= htmlspecialchars(
+                        $enrollmentMessage,
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
     </article>
+    
 
     <section class="mt-5" id="reviewtable">
         <h2 class="mb-3">Õpilaste tagasiside</h2>
