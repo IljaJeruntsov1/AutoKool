@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<?php
+require_once __DIR__ . '/../inc/language.php';
+
+$lang = $_SESSION['language'] ?? 'et';
+
+// Сохраняем текущую страницу и все её параметры
+$currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$queryParams = $_GET;
+
+$queryParams['lang'] = 'et';
+$etUrl = $currentPath . '?' . http_build_query($queryParams);
+
+$queryParams['lang'] = 'en';
+$enUrl = $currentPath . '?' . http_build_query($queryParams);
+?>
+
 <html lang="et">
 <head>
     <meta charset="UTF-8">
@@ -37,9 +53,9 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="./">
-                        Avaleht
-                    </a>
+<a class="nav-link" href="./">
+    <?= t('home') ?>
+</a>
                 </li>
 
                 <li class="nav-item">
@@ -68,6 +84,19 @@
 
             </ul>
 
+<div class="d-flex gap-2 me-3">
+
+    <a href="<?= htmlspecialchars($etUrl, ENT_QUOTES, 'UTF-8') ?>"
+       class="btn btn-outline-light btn-sm">
+         ET
+    </a>
+
+    <a href="<?= htmlspecialchars($enUrl, ENT_QUOTES, 'UTF-8') ?>"
+       class="btn btn-outline-light btn-sm">
+         EN
+    </a>
+
+</div>
             <div class="d-flex">
 
             <?php if (Auth::isLoggedIn()): ?>
@@ -82,7 +111,7 @@
 
                     <form action="logout" method="post" class="m-0">
                         <button type="submit" class="btn btn-outline-light">
-                            Logi välja
+                            <?= t('logout') ?>
                         </button>
                     </form>
                 </div>
