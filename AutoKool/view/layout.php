@@ -30,7 +30,7 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
@@ -100,6 +100,9 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
             <div class="d-flex">
 
             <?php if (Auth::isLoggedIn()): ?>
+                <a href="profile.php" class="btn btn-outline-light me-2">
+                    <?= $lang === 'en' ? 'My profile' : 'Minu profiil' ?>
+                </a>
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <span class="text-white">
                         Tere, <?= htmlspecialchars(
@@ -130,7 +133,7 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
 </nav>
 
 
-<main class="container py-5 flex-grow-1">
+<main class="container py-5">
 
     <?php
 

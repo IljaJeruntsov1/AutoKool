@@ -22,7 +22,12 @@ class Auth
 
         $user = $db->getOne($sql, [$email]);
 
-        if (!$user || !password_verify($password, $user['password'])) {
+        if (
+            !$user ||
+            $user['status'] === 'deleted' ||
+            !is_string($user['password']) ||
+            !password_verify($password, $user['password'])
+        ) {
             return [
                 'success' => false,
                 'message' => 'Vale e-posti aadress või parool.'
