@@ -16,19 +16,20 @@ $isEnglish = $currentLanguage === 'en';
     <title><?= $isEnglish ? 'Student registrations' : 'Kursustele registreerunud õpilased' ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/JPTV24/AutoKool/responsive.css">
 </head>
 
 <body class="bg-light">
 
 <div class="container py-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="admin-page-header mb-4">
 
         <h2>
             <?= $isEnglish ? 'Student registrations' : 'Õpilaste registreeringud' ?>
         </h2>
 
-        <div class="d-flex gap-2 align-items-center">
+        <div class="admin-page-actions align-items-center">
 
             <?php
             $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -76,7 +77,7 @@ $isEnglish = $currentLanguage === 'en';
         </div>
     <?php endif; ?>
 
-    <div class="card shadow-sm">
+    <div class="card admin-list-card shadow-sm">
         <div class="card-body">
 
             <?php if (empty($registrations)): ?>
@@ -87,7 +88,7 @@ $isEnglish = $currentLanguage === 'en';
 
             <?php else: ?>
 
-                <div class="table-responsive">
+                <div class="table-responsive admin-mobile-list">
 
                     <table class="table table-striped align-middle">
 
@@ -108,15 +109,15 @@ $isEnglish = $currentLanguage === 'en';
 
                             <tr>
 
-                                <td><?= htmlspecialchars($registration['username']) ?></td>
+                                <td data-label="<?= $isEnglish ? 'Student' : 'Õpilane' ?>"><?= htmlspecialchars($registration['username'], ENT_QUOTES, 'UTF-8') ?></td>
 
-                                <td><?= htmlspecialchars($registration['email']) ?></td>
+                                <td data-label="<?= $isEnglish ? 'Email' : 'E-post' ?>"><?= htmlspecialchars($registration['email'], ENT_QUOTES, 'UTF-8') ?></td>
 
-                                <td><?= htmlspecialchars($registration['course_title']) ?></td>
+                                <td data-label="<?= $isEnglish ? 'Course' : 'Kursus' ?>"><?= htmlspecialchars($registration['course_title'], ENT_QUOTES, 'UTF-8') ?></td>
 
-                                <td><?= htmlspecialchars($registration['registration_date']) ?></td>
+                                <td data-label="<?= $isEnglish ? 'Registration date' : 'Registreerimise kuupäev' ?>"><?= htmlspecialchars($registration['registration_date'], ENT_QUOTES, 'UTF-8') ?></td>
 
-                                <td>
+                                <td data-label="<?= $isEnglish ? 'Status' : 'Staatus' ?>">
                                     <?php if ($registration['status'] === 'cancelled'): ?>
 
                                         <span class="badge bg-secondary">
@@ -138,13 +139,12 @@ $isEnglish = $currentLanguage === 'en';
                                     <?php endif; ?>
                                 </td>
 
-                                <td>
+                                <td data-label="<?= $isEnglish ? 'Action' : 'Tegevus' ?>">
 
                                     <?php if ($registration['status'] !== 'cancelled'): ?>
 
                                         <form method="POST"
-                                              action="index.php"
-                                              onsubmit="return confirm('<?= $isEnglish ? 'Are you sure you want to remove this student from the course?' : 'Kas soovid selle õpilase kursuselt eemaldada?' ?>');">
+                                              action="index.php">
 
                                             <input type="hidden" name="action" value="cancel_registration">
 
@@ -163,8 +163,7 @@ $isEnglish = $currentLanguage === 'en';
                                     <?php else: ?>
 
                                         <form method="POST"
-                                              action="index.php"
-                                              onsubmit="return confirm('<?= $isEnglish ? 'Do you want to restore this student to the course?' : 'Kas soovid õpilase uuesti kursusele registreerida?' ?>');">
+                                              action="index.php">
 
                                             <input type="hidden" name="action" value="restore_registration">
 

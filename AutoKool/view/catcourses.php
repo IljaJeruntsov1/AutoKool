@@ -32,7 +32,7 @@ ob_start();
 <?php else: ?>
 
     <div class="row g-4">
-
+ы
         <?php foreach ($arr as $course): ?>
 
             <?php

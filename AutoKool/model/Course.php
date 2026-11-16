@@ -39,15 +39,25 @@ class Course
         return $db->getAll($query, [$id]);
     }
 
-    public static function getCourseByID($id)
-    {
-        $query = "SELECT *
-                  FROM courses
-                  WHERE id = ?";
 
-        $db = new Database();
+public static function getCourseByID($id)
+{
+    $query = "SELECT
+                courses.*,
+                instructors.name AS instructor_name,
+                instructors.email AS instructor_email,
+                instructors.phone AS instructor_phone,
+                instructors.description AS instructor_description,
+                instructors.picture AS instructor_picture
+              FROM courses
+              LEFT JOIN instructors
+                ON courses.instructor_id = instructors.id
+              WHERE courses.id = ?";
 
-        return $db->getOne($query, [$id]);
-    }
+    $db = new Database();
+
+    return $db->getOne($query, [$id]);
+}
+
 }
 ?>

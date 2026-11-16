@@ -63,5 +63,49 @@ class Registration
 
         return $db->getAll($sql, [$userId]);
     }
+
+
+    // Получить регистрацию конкретного ученика на курс
+    public static function getUserRegistration($userId, $courseId)
+    {
+        $db = new Database();
+
+        return $db->getOne(
+            "SELECT id, status
+             FROM registrations
+             WHERE user_id = ? AND course_id = ?",
+            [$userId, $courseId]
+        );
+    }
+
+    // Отменить свою заявку
+    public static function cancelUserRegistration($userId, $courseId)
+    {
+        $db = new Database();
+
+        return $db->executeRun(
+            "UPDATE registrations
+             SET status = 'cancelled'
+             WHERE user_id = ?
+               AND course_id = ?
+               AND status = 'pending'",
+            [$userId, $courseId]
+        );
+    }
+
+public static function restoreUserRegistration($userId, $courseId)
+{
+    $db = new Database();
+
+    return $db->executeRun(
+        "UPDATE registrations
+         SET status = 'pending'
+         WHERE user_id = ?
+           AND course_id = ?
+           AND status = 'cancelled'",
+        [$userId, $courseId]
+    );
+}
+
 }
 ?>

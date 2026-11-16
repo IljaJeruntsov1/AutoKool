@@ -156,21 +156,30 @@ th{
     margin: 0;
     border: 1px solid black;
 }
-
-.btn{
-   background-color: #43E16F;
-   border-radius: 3px;
-   margin-left: 10px;
-   height: 30px;
-   border: 0;
-   color: white;
-   font-weight: 600;
+.btn:hover {
+    background-color: #2fc65b;
+    color: white;
 }
 
-p{
-    word-wrap: break-word;
-    display: flex;
-  font-size: 1.2rem;
+.btn {
+    min-height: 45px;
+    height: auto;
+    padding: 10px 20px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1.4;
+    text-align: center;
+
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+p {
+    font-size: 1.2rem;
+    line-height: 1.6;
 }
 
 h1{

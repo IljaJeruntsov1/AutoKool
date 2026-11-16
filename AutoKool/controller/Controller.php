@@ -45,6 +45,22 @@ class Controller
         $reviews = Review::getReviewsByCourseID($courseId);
         $reviewCount = Review::getReviewsCountByCourseID($courseId);
 
+
+
+        $myRegistration = null;
+
+        if (!empty($_SESSION['user']['id']) && !empty($n['id'])) {
+            $myRegistration = Registration::getUserRegistration(
+                (int)$_SESSION['user']['id'],
+                (int)$n['id']
+            );
+        }
+
+        if (empty($_SESSION['enrollment_csrf_token'])) {
+            $_SESSION['enrollment_csrf_token'] = bin2hex(
+                random_bytes(32)
+            );
+        }
         include __DIR__ . '/../view/course.php';
     }
 
@@ -198,5 +214,183 @@ class Controller
 
     exit;
 }
+
+
+    public static function cancelEnrollment()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            exit('Method not allowed');
+        }
+
+        if (
+            empty($_SESSION['user']) ||
+            empty($_SESSION['user']['id'])
+        ) {
+            header('Location: login');
+            exit;
+        }
+
+        $token = $_POST['csrf_token'] ?? '';
+
+        if (
+            !is_string($token) ||
+            empty($_SESSION['enrollment_csrf_token']) ||
+            !hash_equals(
+                $_SESSION['enrollment_csrf_token'],
+                $token
+            )
+        ) {
+            http_response_code(403);
+            exit('Invalid security token');
+        }
+
+        $courseId = filter_var(
+            $_POST['course_id'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+
+        if (!$courseId || $courseId < 1) {
+            http_response_code(400);
+            exit('Invalid course');
+        }
+
+        $userId = (int)$_SESSION['user']['id'];
+
+        $registration = Registration::getUserRegistration(
+            $userId,
+            $courseId
+        );
+
+        if (
+            !$registration ||
+            $registration['status'] !== 'pending'
+        ) {
+            $_SESSION['enrollment_message'] =
+                'Seda registreeringut ei saa tühistada.';
+
+            header(
+                'Location: course?id=' . $courseId .
+                '&enrollment=error'
+            );
+            exit;
+        }
+
+        try {
+            Registration::cancelUserRegistration(
+                $userId,
+                $courseId
+            );
+
+            $_SESSION['enrollment_message'] =
+                'Registreering on edukalt tühistatud.';
+
+            header(
+                'Location: course?id=' . $courseId .
+                '&enrollment=cancelled'
+            );
+            exit;
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+
+            $_SESSION['enrollment_message'] =
+                'Registreeringu tühistamine ebaõnnestus.';
+
+            header(
+                'Location: course?id=' . $courseId .
+                '&enrollment=error'
+            );
+            exit;
+        }
+    }
+
+
+public static function restoreEnrollment()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Method not allowed');
+    }
+
+    if (empty($_SESSION['user']['id'])) {
+        header('Location: login');
+        exit;
+    }
+
+    $token = $_POST['csrf_token'] ?? '';
+
+    if (
+        !is_string($token) ||
+        empty($_SESSION['enrollment_csrf_token']) ||
+        !hash_equals(
+            $_SESSION['enrollment_csrf_token'],
+            $token
+        )
+    ) {
+        http_response_code(403);
+        exit('Invalid security token');
+    }
+
+    $courseId = filter_var(
+        $_POST['course_id'] ?? null,
+        FILTER_VALIDATE_INT
+    );
+
+    if (!$courseId || $courseId < 1) {
+        http_response_code(400);
+        exit('Invalid course');
+    }
+
+    $userId = (int)$_SESSION['user']['id'];
+
+    $registration = Registration::getUserRegistration(
+        $userId,
+        $courseId
+    );
+
+    if (
+        !$registration ||
+        $registration['status'] !== 'cancelled'
+    ) {
+        header(
+            'Location: course?id=' . $courseId .
+            '&enrollment=error'
+        );
+        exit;
+    }
+
+    try {
+        Registration::restoreUserRegistration(
+            $userId,
+            $courseId
+        );
+
+        $_SESSION['enrollment_message'] =
+            ($_SESSION['language'] ?? 'et') === 'en'
+                ? 'You have successfully applied again!'
+                : 'Oled edukalt uuesti kursusele registreerunud!';
+
+        header(
+            'Location: course?id=' . $courseId .
+            '&enrollment=success'
+        );
+        exit;
+
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+
+        $_SESSION['enrollment_message'] =
+            'Registreerimine ebaõnnestus.';
+
+        header(
+            'Location: course?id=' . $courseId .
+            '&enrollment=error'
+        );
+        exit;
+    }
+}
+
+
 }
 ?>

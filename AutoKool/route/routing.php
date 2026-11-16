@@ -68,6 +68,20 @@ elseif (
 ) {
     Controller::enrollCourse();
 }
+
+elseif (
+    $path === 'cancelenroll'
+    && $_SERVER['REQUEST_METHOD'] === 'POST'
+) {
+    Controller::cancelEnrollment();
+}
+elseif (
+    $path === 'restoreenroll'
+    && $_SERVER['REQUEST_METHOD'] === 'POST'
+) {
+    Controller::restoreEnrollment();
+}
+
 else {
     $response = Controller::error404();
 }

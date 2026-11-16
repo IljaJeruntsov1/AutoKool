@@ -30,7 +30,7 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
@@ -130,7 +130,7 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
 </nav>
 
 
-<main class="container py-5">
+<main class="container py-5 flex-grow-1">
 
     <?php
 
