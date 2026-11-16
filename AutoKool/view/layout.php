@@ -100,9 +100,10 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
             <div class="d-flex">
 
             <?php if (Auth::isLoggedIn()): ?>
-                <a href="profile.php" class="btn btn-outline-light me-2">
-                    <?= $lang === 'en' ? 'My profile' : 'Minu profiil' ?>
-                </a>
+<a href="/JPTV24/AutoKool/profile.php"
+   class="btn btn-outline-light me-2">
+    <?= $lang === 'en' ? 'My profile' : 'Minu profiil' ?>
+</a>
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <span class="text-white">
                         Tere, <?= htmlspecialchars(
