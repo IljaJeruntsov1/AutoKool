@@ -110,16 +110,29 @@ public static function createCourse($data)
         );
     }
 
-    // Удалить курс
-    public static function deleteCourse($id)
-    {
-        $db = new Database();
+public static function deleteCourse($id)
+{
+    $db = new Database();
 
-        return $db->executeRun(
-            "DELETE FROM courses WHERE id = ?",
-            [$id]
-        );
-    }
+    return $db->executeRun(
+        "UPDATE courses
+         SET status = 'deleted'
+         WHERE id = ? AND status = 'active'",
+        [$id]
+    );
+}
+
+public static function restoreCourse($id)
+{
+    $db = new Database();
+
+    return $db->executeRun(
+        "UPDATE courses
+         SET status = 'active'
+         WHERE id = ? AND status = 'deleted'",
+        [$id]
+    );
+}
 
 }
 ?>

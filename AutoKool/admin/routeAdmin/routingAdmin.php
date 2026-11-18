@@ -13,6 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'delete_course': AdminController::deleteCourse(); break;
         case 'create_instructor': AdminController::createInstructor(); break;
         case 'update_instructor': AdminController::updateInstructor(); break;
+        case 'restore_course':
+    AdminController::restoreCourse();
+    break;
+    
     case 'change_instructor_status':
     AdminController::changeInstructorStatus();
     break;

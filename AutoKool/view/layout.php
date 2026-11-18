@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php
 require_once __DIR__ . '/../inc/language.php';
+require_once __DIR__ . '/../model/Auth.php';
 
 $lang = $_SESSION['language'] ?? 'et';
 
@@ -15,7 +16,7 @@ $queryParams['lang'] = 'en';
 $enUrl = $currentPath . '?' . http_build_query($queryParams);
 ?>
 
-<html lang="et">
+<html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +28,7 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/JPTV24/AutoKool/style.css">
 </head>
 
 <body>
@@ -100,10 +101,9 @@ $enUrl = $currentPath . '?' . http_build_query($queryParams);
             <div class="d-flex">
 
             <?php if (Auth::isLoggedIn()): ?>
-<a href="/JPTV24/AutoKool/profile.php"
-   class="btn btn-outline-light me-2">
-    <?= $lang === 'en' ? 'My profile' : 'Minu profiil' ?>
-</a>
+                <a href="/JPTV24/AutoKool/profile.php" class="btn btn-outline-light me-2">
+                    <?= $lang === 'en' ? 'My profile' : 'Minu profiil' ?>
+                </a>
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <span class="text-white">
                         Tere, <?= htmlspecialchars(

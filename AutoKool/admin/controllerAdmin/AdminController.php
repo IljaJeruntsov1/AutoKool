@@ -420,4 +420,42 @@ class AdminController
             ($success ? ($status === 'active' ? 'activated' : 'deactivated') : 'error'));
         exit;
     }
+
+    public static function restoreCourse()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Method not allowed');
+    }
+
+    self::validateCsrfToken();
+
+    $id = filter_var(
+        $_POST['course_id'] ?? null,
+        FILTER_VALIDATE_INT
+    );
+
+    if (!$id || $id < 1) {
+        header('Location: ?page=courses&message=invalid');
+        exit;
+    }
+
+    if (!AdminCourse::getCourseById($id)) {
+        http_response_code(404);
+        exit('Kursust ei leitud.');
+    }
+
+    try {
+        $success = AdminCourse::restoreCourse($id);
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        $success = false;
+    }
+
+    header(
+        'Location: ?page=courses&message=' .
+        ($success ? 'restored' : 'error')
+    );
+    exit;
+}
 }
