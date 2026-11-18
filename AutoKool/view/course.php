@@ -465,6 +465,8 @@ ob_start();
 
         <form action="enroll" method="POST">
 
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['enrollment_csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+
             <input
                 type="hidden"
                 name="course_id"
@@ -611,6 +613,8 @@ ob_start();
                 </h3>
 
                 <form action="insertreview" method="post">
+
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['review_csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
 
                     <input
                         type="hidden"

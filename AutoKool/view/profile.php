@@ -85,7 +85,7 @@ ob_start();
                 ? ($isEnglish ? 'Incorrect or missing password.' : 'Vale või puuduv parool.')
                 : ($isEnglish ? 'Could not delete profile. Try again.' : 'Profiili kustutamine ebaõnnestus.') ?></div>
         <?php endif; ?>
-        <form action="profile.php" method="POST" onsubmit="return confirm(<?= $e(json_encode($isEnglish ? 'Delete your profile permanently?' : 'Kas soovid oma profiili jäädavalt kustutada?', JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP)) ?>);">
+        <form action="profile.php" method="POST">
             <input type="hidden" name="action" value="delete_profile">
             <input type="hidden" name="csrf_token" value="<?= $e($_SESSION['profile_csrf_token']) ?>">
             <label for="delete-password" class="form-label fw-semibold"><?= $isEnglish ? 'Confirm with password' : 'Kinnita parooliga' ?></label>

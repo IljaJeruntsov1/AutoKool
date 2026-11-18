@@ -25,6 +25,18 @@ elseif (
     && $_SERVER['REQUEST_METHOD'] === 'POST'
     && isset($_POST['review'], $_POST['id'])
 ) {
+    $user = Auth::currentUser();
+    $token = $_POST['csrf_token'] ?? '';
+    if (!$user || ($user['status'] ?? '') !== 'student') {
+        http_response_code(403);
+        exit('Log in as a student to submit a review.');
+    }
+    if (!is_string($token) || empty($_SESSION['review_csrf_token']) ||
+        !hash_equals($_SESSION['review_csrf_token'], $token)) {
+        http_response_code(403);
+        exit('Invalid security token');
+    }
+
     $reviewText = trim($_POST['review']);
     $courseId = filter_var($_POST['id'], FILTER_VALIDATE_INT);
 

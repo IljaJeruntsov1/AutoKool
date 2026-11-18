@@ -61,6 +61,9 @@ class Controller
                 random_bytes(32)
             );
         }
+        if (empty($_SESSION['review_csrf_token'])) {
+            $_SESSION['review_csrf_token'] = bin2hex(random_bytes(32));
+        }
         include __DIR__ . '/../view/course.php';
     }
 
@@ -72,6 +75,12 @@ class Controller
 
     public static function InsertReview($text, $id)
     {
+        $user = Auth::currentUser();
+        if (!$user || ($user['status'] ?? '') !== 'student') {
+            http_response_code(403);
+            exit('Log in as a student to submit a review.');
+        }
+
         $courseId = filter_var($id, FILTER_VALIDATE_INT);
         $text = trim($text);
 
@@ -87,7 +96,12 @@ class Controller
             return;
         }
 
-        Review::insertReview($text, $courseId);
+        if (!Review::userCanPostReview((int)$user['id'])) {
+            http_response_code(429);
+            exit('Review limit reached. Please try again later.');
+        }
+
+        Review::insertReview($text, $courseId, (int)$user['id']);
 
         header('Location: course?id=' . $courseId . '#reviewtable');
         exit;
@@ -194,6 +208,13 @@ class Controller
 
         header('Location: login');
         exit;
+    }
+
+    $token = $_POST['csrf_token'] ?? '';
+    if (!is_string($token) || empty($_SESSION['enrollment_csrf_token']) ||
+        !hash_equals($_SESSION['enrollment_csrf_token'], $token)) {
+        http_response_code(403);
+        exit('Invalid security token');
     }
 
     $user = Auth::currentUser();

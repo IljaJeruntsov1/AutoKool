@@ -2,6 +2,20 @@
 
 class Review
 {
+    public static function userCanPostReview(int $userId): bool
+    {
+        $db = new Database();
+        $row = $db->getOne(
+            "SELECT COUNT(*) AS review_count
+             FROM reviews
+             WHERE user_id = ?
+               AND date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 HOUR)",
+            [$userId]
+        );
+
+        return (int)($row['review_count'] ?? 0) < 3;
+    }
+
     public static function insertReview($text, $courseId, $userId = null)
     {
         $query = "INSERT INTO reviews

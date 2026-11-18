@@ -3,13 +3,41 @@
 class Database
 {
     private $conn;
-    private $host = 'localhost';
-    private $user = 'root';
-    private $password = '';
-    private $baseName = 'autokool';
+    private $host;
+    private $user;
+    private $password;
+    private $baseName;
 
     public function __construct()
     {
+        $this->host = getenv('AUTOKOOL_DB_HOST') ?: 'localhost';
+        $this->baseName = getenv('AUTOKOOL_DB_NAME') ?: 'autokool';
+
+        $configuredUser = getenv('AUTOKOOL_DB_USER');
+        $configuredPassword = getenv('AUTOKOOL_DB_PASSWORD');
+        $isLocalXamppRequest = in_array(
+            $_SERVER['REMOTE_ADDR'] ?? '',
+            ['127.0.0.1', '::1'],
+            true
+        ) && preg_match('/^(localhost|127\.0\.0\.1)(:\d+)?$/i', $_SERVER['HTTP_HOST'] ?? '');
+
+        $usingLocalFallback = ($configuredUser === false || $configuredUser === '') && $isLocalXamppRequest;
+        if ($usingLocalFallback) {
+            // Keep the existing default XAMPP setup working on loopback only.
+            $this->user = 'root';
+            $this->password = '';
+        } else {
+            $this->user = $configuredUser ?: '';
+            $this->password = $configuredPassword ?: '';
+        }
+
+        if (!$usingLocalFallback &&
+            ($this->user === '' || $this->user === 'root' || $this->password === '')) {
+            throw new RuntimeException(
+                'Configure AUTOKOOL_DB_USER with a dedicated database user and AUTOKOOL_DB_PASSWORD.'
+            );
+        }
+
         $this->connect();
     }
 

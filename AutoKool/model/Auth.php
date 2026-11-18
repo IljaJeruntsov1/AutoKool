@@ -2,6 +2,49 @@
 
 class Auth
 {
+    private static function updateLoginAttempts(string $email, string $operation): bool
+    {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $key = hash('sha256', strtolower($email) . '|' . $ip);
+        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'autokool-login-' . $key . '.json';
+        $handle = @fopen($path, 'c+');
+        if ($handle === false || !flock($handle, LOCK_EX)) {
+            if (is_resource($handle)) {
+                fclose($handle);
+            }
+            // Fail closed if the rate-limit store is unavailable.
+            return true;
+        }
+
+        rewind($handle);
+        $stored = stream_get_contents($handle);
+        $attempts = json_decode($stored ?: '[]', true);
+        if (!is_array($attempts)) {
+            $attempts = [];
+        }
+        $cutoff = time() - 900;
+        $attempts = array_values(array_filter(
+            $attempts,
+            static fn($timestamp) => is_int($timestamp) && $timestamp > $cutoff
+        ));
+
+        $limited = count($attempts) >= 8;
+        if ($operation === 'failed' && !$limited) {
+            $attempts[] = time();
+        } elseif ($operation === 'success') {
+            $attempts = [];
+        }
+
+        rewind($handle);
+        ftruncate($handle, 0);
+        fwrite($handle, json_encode($attempts));
+        fflush($handle);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+
+        return $operation === 'check' && $limited;
+    }
+
     public static function login($email, $password)
     {
         $email = trim($email);
@@ -10,6 +53,13 @@ class Auth
             return [
                 'success' => false,
                 'message' => 'Palun kontrolli e-posti aadressi ja parooli.'
+            ];
+        }
+
+        if (self::updateLoginAttempts($email, 'check')) {
+            return [
+                'success' => false,
+                'message' => 'Vale e-posti aadress vГµi parool.'
             ];
         }
 
@@ -28,11 +78,14 @@ class Auth
             !is_string($user['password']) ||
             !password_verify($password, $user['password'])
         ) {
+            self::updateLoginAttempts($email, 'failed');
             return [
                 'success' => false,
                 'message' => 'Vale e-posti aadress või parool.'
             ];
         }
+
+        self::updateLoginAttempts($email, 'success');
 
         session_regenerate_id(true);
 
