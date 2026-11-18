@@ -431,6 +431,18 @@ $isEnglish = $currentLanguage === 'en';
 
         </div>
 
+        <div class="col-12 col-lg-6">
+            <a href="?page=deletedProfiles" class="admin-card">
+                <div class="admin-icon icon-registrations"><i class="bi bi-person-check"></i></div>
+                <div>
+                    <div class="admin-card-title"><?= $isEnglish ? 'Restore profiles' : 'Taasta profiile' ?></div>
+                    <p class="admin-card-description"><?= $isEnglish
+                        ? 'Restore deleted profiles and set new sign-in details.'
+                        : 'Taasta kustutatud profiile ja määra uued sisselogimisandmed.' ?></p>
+                </div>
+                <i class="bi bi-arrow-right admin-arrow"></i>
+            </a>
+        </div>
     </div>
 
 </main>

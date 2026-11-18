@@ -25,7 +25,10 @@ ob_start();
 <div class="profile-wrap">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
         <h1 class="fw-bold mb-0"><?= $isEnglish ? 'My profile' : 'Minu profiil' ?></h1>
-        <a class="btn btn-outline-primary" href="allcourses"><?= $isEnglish ? 'Browse courses' : 'Vaata kursuseid' ?></a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-primary" href="allcourses"><?= $isEnglish ? 'Browse courses' : 'Vaata kursuseid' ?></a>
+            <a class="btn btn-danger" href="#delete-profile"><?= $isEnglish ? 'Delete profile' : 'Kustuta profiil' ?></a>
+        </div>
     </div>
     <div class="card shadow-sm profile-card mb-4"><div class="card-body p-4">
         <h2 class="h5 fw-bold mb-3"><?= $isEnglish ? 'Personal information' : 'Isikuandmed' ?></h2>
@@ -72,8 +75,7 @@ ob_start();
             </div>
         <?php endforeach; ?>
     </div></div>
-    <?php if ($user['status'] === 'student'): ?>
-    <div class="profile-danger mt-5">
+    <div id="delete-profile" class="profile-danger mt-5">
         <h2 class="h4 fw-bold text-danger"><?= $isEnglish ? 'Delete profile' : 'Kustuta profiil' ?></h2>
         <p><?= $isEnglish
             ? 'Your applications and linked reviews will be erased. Email, password and registration date will be removed. Only your name, technical ID and deleted status will remain. This cannot be undone.'
@@ -91,7 +93,6 @@ ob_start();
             <button type="submit" class="btn btn-danger"><?= $isEnglish ? 'Delete my profile' : 'Kustuta minu profiil' ?></button>
         </form>
     </div>
-    <?php endif; ?>
 </div>
 <?php
 $content = ob_get_clean();

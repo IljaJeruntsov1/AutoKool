@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     case 'change_instructor_status':
     AdminController::changeInstructorStatus();
     break;
+        case 'restore_profile': AdminController::restoreProfile(); break;
         default: http_response_code(404); exit('Toimingut ei leitud.');
     }
     exit;
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $page = $_GET['page'] ?? 'dashboard';
 switch ($page) {
     case 'dashboard': AdminController::dashboard(); break;
+    case 'deletedProfiles': AdminController::deletedProfiles(); break;
     case 'reviews': AdminController::reviews(); break;
     case 'registrations': AdminController::registrations(); break;
     case 'courseAdd': AdminController::courseAdd(); break;

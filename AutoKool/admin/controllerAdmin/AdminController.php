@@ -4,12 +4,53 @@ require_once dirname(__DIR__) . '/modelAdmin/AdminRegistration.php';
 require_once dirname(__DIR__) . '/modelAdmin/AdminReview.php';
 require_once dirname(__DIR__) . '/modelAdmin/AdminCourse.php';
 require_once dirname(__DIR__) . '/modelAdmin/AdminInstructor.php';
+require_once dirname(__DIR__) . '/modelAdmin/AdminUser.php';
 
 class AdminController
 {
     public static function dashboard()
     {
         require __DIR__ . '/../viewAdmin/dashboard.php';
+    }
+
+    public static function deletedProfiles()
+    {
+        $profiles = AdminUser::getDeletedProfiles();
+        $csrfToken = self::getCsrfToken();
+        $message = $_GET['message'] ?? '';
+        require __DIR__ . '/../viewAdmin/deletedProfiles.php';
+    }
+
+    public static function restoreProfile()
+    {
+        self::requirePost();
+        self::validateCsrfToken();
+
+        $id = self::validId($_POST['user_id'] ?? null);
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        if (!$id || !filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 150 ||
+            !is_string($password) || strlen($password) < 8) {
+            header('Location: ?page=deletedProfiles&message=invalid');
+            exit;
+        }
+
+        try {
+            if (AdminUser::restoreProfile($id, $email, $password)) {
+                header('Location: ?page=deletedProfiles&message=restored');
+                exit;
+            }
+            header('Location: ?page=deletedProfiles&message=not_found');
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                header('Location: ?page=deletedProfiles&message=email_exists');
+                exit;
+            }
+            error_log('AutoKool restore profile: ' . $e->getMessage());
+            header('Location: ?page=deletedProfiles&message=error');
+        }
+        exit;
     }
 
     private static function getCsrfToken()
