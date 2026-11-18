@@ -612,6 +612,14 @@ ob_start();
                         : 'Jäta tagasiside' ?>
                 </h3>
 
+                <?php if (!empty($_SESSION['review_login_required'])): ?>
+                    <?php unset($_SESSION['review_login_required']); ?>
+                    <div class="alert alert-info" role="status">
+                        <?= $isEnglish ? 'Please sign in to submit a review.' : 'Tagasiside saatmiseks logi palun sisse.' ?>
+                        <a class="alert-link" href="login"><?= $isEnglish ? 'Sign in' : 'Logi sisse' ?></a>
+                    </div>
+                <?php endif; ?>
+
                 <form action="insertreview" method="post">
 
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['review_csrf_token'], ENT_QUOTES, 'UTF-8') ?>">

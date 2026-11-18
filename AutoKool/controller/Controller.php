@@ -76,16 +76,18 @@ class Controller
     public static function InsertReview($text, $id)
     {
         $user = Auth::currentUser();
-        if (!$user || ($user['status'] ?? '') !== 'student') {
-            http_response_code(403);
-            exit('Log in as a student to submit a review.');
-        }
-
         $courseId = filter_var($id, FILTER_VALIDATE_INT);
         $text = trim($text);
 
         if (!$courseId || $courseId < 1 || $text === '' || mb_strlen($text) > 2000) {
             header('Location: allcourses');
+            exit;
+        }
+
+        if (!$user || ($user['status'] ?? '') !== 'student') {
+            $_SESSION['review_login_required'] = true;
+            $_SESSION['return_to'] = 'course?id=' . $courseId . '#reviewtable';
+            header('Location: course?id=' . $courseId . '#reviewtable');
             exit;
         }
 
