@@ -28,9 +28,10 @@ class Auth
             static fn($timestamp) => is_int($timestamp) && $timestamp > $cutoff
         ));
 
-        $limited = count($attempts) >= 8;
+        $limited = count($attempts) >= 3;
         if ($operation === 'failed' && !$limited) {
             $attempts[] = time();
+            $limited = count($attempts) >= 3;
         } elseif ($operation === 'success') {
             $attempts = [];
         }
@@ -42,7 +43,26 @@ class Auth
         flock($handle, LOCK_UN);
         fclose($handle);
 
-        return $operation === 'check' && $limited;
+        if ($operation === 'check' && $limited) {
+            $_SESSION['login_locked_until'] = end($attempts) + 900;
+        }
+
+        return in_array($operation, ['check', 'failed'], true) && $limited;
+    }
+
+    public static function isLoginLockedForSession(): bool
+    {
+        return self::getLoginLockRemaining() > 0;
+    }
+
+    public static function getLoginLockRemaining(): int
+    {
+        $lockedUntil = (int)($_SESSION['login_locked_until'] ?? 0);
+        if ($lockedUntil <= time()) {
+            unset($_SESSION['login_locked_until']);
+            return 0;
+        }
+        return $lockedUntil - time();
     }
 
     public static function login($email, $password)
@@ -78,7 +98,10 @@ class Auth
             !is_string($user['password']) ||
             !password_verify($password, $user['password'])
         ) {
-            self::updateLoginAttempts($email, 'failed');
+            $locked = self::updateLoginAttempts($email, 'failed');
+            if ($locked) {
+                $_SESSION['login_locked_until'] = time() + 900;
+            }
             return [
                 'success' => false,
                 'message' => 'Vale e-posti aadress või parool.'

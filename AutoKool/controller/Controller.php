@@ -132,7 +132,16 @@ class Controller
     // Авторизация: показать форму входа
     public static function loginForm()
     {
-        $result = null;
+        $loginLockRemaining = Auth::getLoginLockRemaining();
+        $result = $loginLockRemaining > 0
+            ? [
+                'success' => false,
+                'locked' => true,
+                'message' => ($_SESSION['language'] ?? 'et') === 'en'
+                    ? 'Sign-in is limited for 15 minutes after 3 failed attempts.'
+                    : 'Kolme ebaõnnestunud katse järel on sisselogimine 15 minutiks piiratud.'
+            ]
+            : null;
         include __DIR__ . '/../view/login.php';
     }
 
@@ -143,6 +152,14 @@ class Controller
             $_POST['email'] ?? '',
             $_POST['password'] ?? ''
         );
+
+        if (Auth::isLoginLockedForSession()) {
+            $result['locked'] = true;
+            $result['message'] = ($_SESSION['language'] ?? 'et') === 'en'
+                ? 'Sign-in is limited for 15 minutes after 3 failed attempts.'
+                : 'Kolme ebaõnnestunud katse järel on sisselogimine 15 minutiks piiratud.';
+        }
+        $loginLockRemaining = Auth::getLoginLockRemaining();
 
         if ($result['success']) {
             $returnTo = $_SESSION['return_to'] ?? './';
